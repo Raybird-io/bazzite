@@ -12,44 +12,52 @@ cp -avf "/ctx/system_files"/. /
 # List of rpmfusion packages can be found here:
 # https://mirrors.rpmfusion.org/mirrorlist?path=free/fedora/updates/43/x86_64/repoview/index.html&protocol=https&redirect=1
 
-# 1. enable Dux Labs COPRs (e.g. Dux Shell formery DMS ,Dux Files, Dux Calendar)
+# 1. Enable Dux Labs COPRs (avengemedia/danklinux = same team, pre-rebrand name)
 dnf5 -y copr enable duxlabs/dux
 dnf5 -y copr enable duxlabs/dms
+dnf5 -y copr enable avengemedia/danklinux
+dnf5 -y copr enable avengemedia/dms
 
-# 2. Install niri + the dux suite 
+# 2. Install niri + the Dux suite
 dnf5 -y install \
-    niri \
-    dms \
-    dms-greeter \
-    dux-files \
-    dcal \
-    dgop \
-    dsearch \
-    matugen \
-    cliphist \
-    wl-clipboard
+niri \
+dms \
+dcal \
+dgop \
+dsearch \
+matugen \
+cliphist \
+wl-clipboard
 
-# 2a. Check if packages are installed 
-rpm -q niri quickshell dms dms-greeter dux-files dcal dgop dsearch
+# 2b. Greeter + Files: install if available, don't fail the build if not
+dnf5 -y install --skip-unavailable dms-greeter
+dnf5 -y install dux-files || dnf5 -y install dux-files-git || true
+
+# 2a. Check the core packages (must be present) and that the shell is 2.x
+rpm -q niri quickshell dms dankcalendar dgop danksearch
 DMS_VER="$(rpm -q --qf '%{VERSION}' dms)"
 case "$DMS_VER" in
-    2.*) echo "Dux Shell $DMS_VER OK" ;;
-    *)   echo "Expected Dux Shell 2.x, got $DMS_VER" >&2; exit 1 ;;
+2.*) echo "Dux Shell $DMS_VER OK" ;;
+*)   echo "Expected Dux Shell 2.x, got $DMS_VER" >&2; exit 1 ;;
 esac
+# Show greeter/Files versions in the log, without failing if one is missing
+rpm -q dms-greeter dux-files dux-files-git || true
 
 # 3. Disable the COPRs so they don't stay enabled on the final image
 dnf5 -y copr disable duxlabs/dux
 dnf5 -y copr disable duxlabs/dms
+dnf5 -y copr disable avengemedia/danklinux
+dnf5 -y copr disable avengemedia/dms
 
 # 4. Start the shell automatically whenever a niri session starts
 if [ -f /usr/lib/systemd/user/dms.service ]; then
-    mkdir -p /usr/lib/systemd/user/niri.service.wants
-    ln -sf /usr/lib/systemd/user/dms.service \
-        /usr/lib/systemd/user/niri.service.wants/dms.service
+mkdir -p /usr/lib/systemd/user/niri.service.wants
+ln -sf /usr/lib/systemd/user/dms.service \
+/usr/lib/systemd/user/niri.service.wants/dms.service
 fi
 
 
-# --------- Template comments keeping for context 
+# --------- Template comments keeping for context
 
 # this installs a package from fedora repos
 # dnf5 install -y tmux
