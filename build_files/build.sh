@@ -12,15 +12,13 @@ cp -avf "/ctx/system_files"/. /
 # List of rpmfusion packages can be found here:
 # https://mirrors.rpmfusion.org/mirrorlist?path=free/fedora/updates/43/x86_64/repoview/index.html&protocol=https&redirect=1
 
-# 1. Enable COPRs 
+# Enable COPRs 
 dnf5 -y copr enable duxlabs/dux
 dnf5 -y copr enable duxlabs/dms
 dnf5 -y copr enable avengemedia/danklinux
 dnf5 -y copr enable avengemedia/dms
 
-
-
-# 2. Install niri + the Dux suite
+# Install niri + the Dux suite
 dnf5 -y install \
 niri \
 dms \
@@ -39,13 +37,13 @@ dnf5 install -y brave-browser
 mv --verbose /opt/brave.com /usr/lib/brave.com
 echo "L /var/opt/brave.com - - - - /usr/lib/brave.com" > /usr/lib/tmpfiles.d/brave.conf
 
-# 2.1. Greeter + Files: install if available, don't fail the build if not
+# Greeter + Files: install if available, don't fail the build if not
 dnf5 -y install --skip-unavailable dms-greeter
 dnf5 -y install dux-files || dnf5 -y install dux-files-git || true
 
 
 
-# 2.3. Check the core packages (must be present) and that the shell is 2.x
+# Check the core packages (must be present) and that the shell is 2.x
 rpm -q niri quickshell dms dankcalendar dgop danksearch
 DMS_VER="$(rpm -q --qf '%{VERSION}' dms)"
 case "$DMS_VER" in
@@ -57,13 +55,14 @@ rpm -q dms-greeter dux-files dux-files-git || true
 
 
 
-# 3. Disable the COPRs so they don't stay enabled on the final image
+# Disable the extra repos so they don't stay enabled on the final image
 dnf5 -y copr disable duxlabs/dux
 dnf5 -y copr disable duxlabs/dms
 dnf5 -y copr disable avengemedia/danklinux
 dnf5 -y copr disable avengemedia/dms
+dnf5 config-manager setopt brave-browser.enabled=0
 
-# 4. Start the shell automatically whenever a niri session starts
+# Start the shell automatically whenever a niri session starts
 if [ -f /usr/lib/systemd/user/dms.service ]; then
 mkdir -p /usr/lib/systemd/user/niri.service.wants
 ln -sf /usr/lib/systemd/user/dms.service \
