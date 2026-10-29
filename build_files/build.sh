@@ -12,13 +12,11 @@ cp -avf "/ctx/system_files"/. /
 # List of rpmfusion packages can be found here:
 # https://mirrors.rpmfusion.org/mirrorlist?path=free/fedora/updates/43/x86_64/repoview/index.html&protocol=https&redirect=1
 
-# 1. Enable COPRs 
+# 1. Enable Dux Labs COPRs (avengemedia/danklinux = same team, pre-rebrand name)
 dnf5 -y copr enable duxlabs/dux
 dnf5 -y copr enable duxlabs/dms
 dnf5 -y copr enable avengemedia/danklinux
 dnf5 -y copr enable avengemedia/dms
-#1.1 Enable official brave RPM 
-dnf5 -y config-manager addrepo --from-repofile=https://brave.com
 
 # 2. Install niri + the Dux suite
 dnf5 -y install \
@@ -29,8 +27,7 @@ dgop \
 dsearch \
 matugen \
 cliphist \
-wl-clipboard \
-brave-browser
+wl-clipboard
 
 # 2b. Greeter + Files: install if available, don't fail the build if not
 dnf5 -y install --skip-unavailable dms-greeter
