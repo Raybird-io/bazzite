@@ -17,8 +17,8 @@ dnf5 -y copr enable duxlabs/dux
 dnf5 -y copr enable duxlabs/dms
 dnf5 -y copr enable avengemedia/danklinux
 dnf5 -y copr enable avengemedia/dms
-
-
+#1.1 Enable official brave RPM 
+dnf5 -y config-manager addrepo --from-repofile=https://brave.com
 
 # 2. Install niri + the Dux suite
 dnf5 -y install \
@@ -29,23 +29,14 @@ dgop \
 dsearch \
 matugen \
 cliphist \
-wl-clipboard
+wl-clipboard \
+brave-browser
 
-# Brave (official RPM)
-dnf5 config-manager addrepo --from-repofile=https://brave-browser-rpm-release.s3.brave.com/brave-browser.repo
-dnf5 install -y brave-browser
-
-# Brave installs into /opt, which bootc never updates. Move it to /usr and link it back at boot.
-mv --verbose /opt/brave.com /usr/lib/brave.com
-echo "L /var/opt/brave.com - - - - /usr/lib/brave.com" > /usr/lib/tmpfiles.d/brave.conf
-
-# 2.1. Greeter + Files: install if available, don't fail the build if not
+# 2b. Greeter + Files: install if available, don't fail the build if not
 dnf5 -y install --skip-unavailable dms-greeter
 dnf5 -y install dux-files || dnf5 -y install dux-files-git || true
 
-
-
-# 2.3. Check the core packages (must be present) and that the shell is 2.x
+# 2a. Check the core packages (must be present) and that the shell is 2.x
 rpm -q niri quickshell dms dankcalendar dgop danksearch
 DMS_VER="$(rpm -q --qf '%{VERSION}' dms)"
 case "$DMS_VER" in
@@ -54,8 +45,6 @@ case "$DMS_VER" in
 esac
 # Show greeter/Files versions in the log, without failing if one is missing
 rpm -q dms-greeter dux-files dux-files-git || true
-
-
 
 # 3. Disable the COPRs so they don't stay enabled on the final image
 dnf5 -y copr disable duxlabs/dux
