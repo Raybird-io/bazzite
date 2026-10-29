@@ -41,8 +41,6 @@ echo "L /var/opt/brave.com - - - - /usr/lib/brave.com" > /usr/lib/tmpfiles.d/bra
 dnf5 -y install --skip-unavailable dms-greeter
 dnf5 -y install dux-files || dnf5 -y install dux-files-git || true
 
-
-
 # Check the core packages (must be present) and that the shell is 2.x
 rpm -q niri quickshell dms dankcalendar dgop danksearch
 DMS_VER="$(rpm -q --qf '%{VERSION}' dms)"
@@ -52,8 +50,6 @@ case "$DMS_VER" in
 esac
 # Show greeter/Files versions in the log, without failing if one is missing
 rpm -q dms-greeter dux-files dux-files-git || true
-
-
 
 # Disable the extra repos so they don't stay enabled on the final image
 dnf5 -y copr disable duxlabs/dux
@@ -68,7 +64,6 @@ mkdir -p /usr/lib/systemd/user/niri.service.wants
 ln -sf /usr/lib/systemd/user/dms.service \
 /usr/lib/systemd/user/niri.service.wants/dms.service
 fi
-
 
 # --------- Template comments keeping for context
 
