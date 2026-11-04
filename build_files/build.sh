@@ -5,6 +5,9 @@ set -ouex pipefail
 # Copy the contents of system_files/ of the git repo to /
 cp -avf "/ctx/system_files"/. /
 
+# Empty mount point for Nix (the Nix store itself lives in /var/home/nix)
+mkdir -p /nix
+
 ### Install packages
 
 # Enable COPRs
