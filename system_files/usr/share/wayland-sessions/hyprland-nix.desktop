@@ -1,0 +1,6 @@
+[Desktop Entry]
+Name=Hyprland (Nix)
+Comment=Hyprland from home-manager
+Exec=/home/kriss/.nix-profile/bin/start-hyprland
+Type=Application
+DesktopNames=Hyprland
