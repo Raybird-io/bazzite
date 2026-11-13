@@ -32,9 +32,6 @@ dnf5 -y install \
 dnf5 -y copr disable duxlabs/dms
 dnf5 -y copr disable duxlabs/dux-repo
 
-### Visual Studio Code, from Microsoft
-dnf5 -y --enablerepo=vscde install code
-
 ### From Terra (already configured in Bazzite)
 # umbriel-nightly: the compositor. Only nightly builds exist. Also pulls in its
 #   screen-sharing portal (xdg-desktop-portal-umbriel-nightly) and xwayland-satellite.
