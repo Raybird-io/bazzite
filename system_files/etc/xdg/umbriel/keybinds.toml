@@ -1,0 +1,80 @@
+# ─── Keybinds ──────────────────────────────────────────────
+# Dux can't generate binds for Umbriel, so its shortcuts are
+# here as "dms ipc call ..." commands (same keys as on Niri).
+[keybinds]
+
+# Apps
+"Mod+T" = "spawn ptyxis"
+"Mod+B" = "spawn xdg-open https://"
+"Mod+E" = "spawn xdg-open ."
+
+# Dux Shell
+"Mod+Space"    = { action = "spawn dms ipc call spotlight toggle", repeat = false }
+"Mod+V"        = { action = "spawn dms ipc call clipboard toggle", repeat = false }
+"Mod+N"        = { action = "spawn dms ipc call notifications toggle", repeat = false }
+"Mod+M"        = { action = "spawn dms ipc call processlist toggle", repeat = false }
+"Mod+Comma"    = { action = "spawn dms ipc call settings toggle", repeat = false }
+"Mod+X"        = { action = "spawn dms ipc call powermenu toggle", repeat = false }
+"Mod+Alt+L"    = { action = "spawn dms ipc call lock lock", repeat = false }
+"Mod+S"        = { action = "spawn dms screenshot", repeat = false }
+
+# Volume, media and brightness (work on the lock screen too)
+"XF86AudioRaiseVolume"  = { action = "spawn dms ipc call audio increment 3", allow_when_locked = true }
+"XF86AudioLowerVolume"  = { action = "spawn dms ipc call audio decrement 3", allow_when_locked = true }
+"XF86AudioMute"         = { action = "spawn dms ipc call audio mute", allow_when_locked = true, repeat = false }
+"XF86AudioPlay"         = { action = "spawn dms ipc call mpris playPause", allow_when_locked = true, repeat = false }
+"XF86AudioNext"         = { action = "spawn dms ipc call mpris next", allow_when_locked = true }
+"XF86AudioPrev"         = { action = "spawn dms ipc call mpris previous", allow_when_locked = true }
+
+# Windows
+"Mod+Q"       = "window-close"
+"Mod+MouseMiddle"       = "window-toggle-maximize"
+"Mod+Shift+MouseMiddle" = { action = "window-toggle-fullscreen", repeat = false }
+"Mod+Shift+V" = "window-toggle-floating"
+"Mod+R"       = "window-cycle-primary-extent"
+"Mod+C"       = "column-center"
+"Mod+W"       = "column-toggle-tabbed"
+"Mod+Minus"   = "window-modify-primary-extent -0.05"
+"Mod+Equal"   = "window-modify-primary-extent +0.05"
+
+# Focus (crosses to the other monitor at the edge)
+"Mod+Left"  = "window-focus-or-output-left"
+"Mod+Right" = "window-focus-or-output-right"
+"Mod+Up"    = "window-focus-or-workspace-up"
+"Mod+Down"  = "window-focus-or-workspace-down"
+
+# Move windows (also across monitors)
+"Mod+Shift+Left"  = "window-move-or-output-left"
+"Mod+Shift+Right" = "window-move-or-output-right"
+"Mod+Ctrl+WheelUp"    = "window-move-or-workspace-up"
+"Mod+Ctrl+WheelDown"  = "window-move-or-workspace-down"
+
+# Overview
+"Mod+Tab" = { action = "overview-toggle", repeat = false }
+
+# Switch monitor
+"Alt+Tab"       = "output-focus-next"
+
+# Mouse wheel: workspaces, and Shift to move through the strip
+"Mod+Shift+WheelUp"         = { action = "workspace-previous", cooldown_ms = 150 }
+"Mod+Shift+WheelDown"       = { action = "workspace-next", cooldown_ms = 150 }
+"Mod+WheelUp"   = { action = "window-focus-previous", cooldown_ms = 150 }
+"Mod+WheelDown" = { action = "window-focus-next", cooldown_ms = 150 }
+
+# Workspaces
+"Mod+1" = "workspace-switch 1"
+"Mod+2" = "workspace-switch 2"
+"Mod+3" = "workspace-switch 3"
+"Mod+4" = "workspace-switch 4"
+"Mod+5" = "workspace-switch 5"
+"Mod+6" = "workspace-switch 6"
+"Mod+Shift+1" = "window-move-to-workspace 1"
+"Mod+Shift+2" = "window-move-to-workspace 2"
+"Mod+Shift+3" = "window-move-to-workspace 3"
+"Mod+Shift+4" = "window-move-to-workspace 4"
+"Mod+Shift+5" = "window-move-to-workspace 5"
+"Mod+Shift+6" = "window-move-to-workspace 6"
+
+# Session
+"Mod+Shift+R" = "config-reload"
+"Mod+Shift+E" = "session-quit"

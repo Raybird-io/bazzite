@@ -1,0 +1,111 @@
+#!/bin/bash
+# ── Set up monitors automatically (Umbriel) ──
+# Started by umbriel-monitors.service, only in Umbriel sessions.
+# Whenever a monitor is plugged in or removed, this works out:
+#   - each monitor's best resolution and refresh rate
+#   - the main monitor (the fastest one) and the side monitors
+#   - the right layout for each (wide windows on the main one,
+#     stacked windows on portrait side monitors)
+# and writes it to ~/.local/state/umbriel/monitors.toml, which
+# Umbriel's config includes. No monitor names needed anywhere.
+set -e
+
+# ── My choices ──
+SIDE_ROTATION="270"   # side monitors: "270" or "90" = turned to portrait, "normal" = not turned
+
+FILE="$HOME/.local/state/umbriel/monitors.toml"
+mkdir -p "$(dirname "$FILE")"
+
+# Monitors, main one first: name, width, height, refresh (in mHz)
+# Each monitor's best mode = most pixels, then highest refresh rate
+# Main monitor = the fastest one (the gaming screen), then the biggest
+list_monitors() {
+  jq -r '
+    map(select((.modes | length) > 0)
+        | .best = (.modes | max_by([.width * .height, .refresh_mhz])))
+    | sort_by([-.best.refresh_mhz, -(.best.width * .best.height), .name])
+    | .[] | [.name, .best.width, .best.height, .best.refresh_mhz] | @tsv'
+}
+
+make_config() {
+  x=0          # where the next monitor starts, left to right
+  main=1
+  echo "# Made automatically by the umbriel-monitors helper (/usr/libexec/umbriel-monitors)."
+  echo "# Don't edit: it's rewritten whenever monitors change."
+
+  while IFS=$'\t' read -r name width height mhz; do
+    if [ "$mhz" -gt 0 ]; then
+      mode="$width"x"$height@$(awk -v m="$mhz" 'BEGIN { printf "%.3f", m / 1000 }')"
+    else
+      mode="$width"x"$height"
+    fi
+
+    echo
+    if [ "$main" = 1 ]; then
+      # Main monitor: windows a third wide, VRR in fullscreen, games open here
+      echo "# Main monitor"
+      echo "[output.\"$name\"]"
+      echo "mode = \"$mode\""
+      echo "position = [$x, 0]"
+      echo "transform = \"normal\""
+      echo "vrr = \"fullscreen\""
+      echo "focus_at_startup = true"
+      echo "layout.scrolling.default_extent_fraction = 0.33"
+      echo
+      echo "[[window_rule]]"
+      echo "match.app_id = \"^steam_app_\""
+      echo "default_output = \"$name\""
+      x=$((x + width))
+      main=0
+
+    elif [ "$SIDE_ROTATION" = "normal" ]; then
+      # Landscape side monitor: windows half wide
+      echo "# Side monitor (landscape)"
+      echo "[output.\"$name\"]"
+      echo "mode = \"$mode\""
+      echo "position = [$x, 0]"
+      echo "transform = \"normal\""
+      echo "layout.scrolling.default_extent_fraction = 0.5"
+      x=$((x + width))
+
+    else
+      # Portrait side monitor: windows stacked top to bottom, 45% tall
+      # so a "lip" of the next one shows, with small edge gaps
+      echo "# Side monitor (portrait)"
+      echo "[output.\"$name\"]"
+      echo "mode = \"$mode\""
+      echo "position = [$x, 0]"
+      echo "transform = \"$SIDE_ROTATION\""
+      echo "workspace_axis = \"horizontal\""
+      echo "layout.scrolling.default_extent_fraction = 0.45"
+      for i in 1 2 3 4 5 6; do
+        echo
+        echo "[[workspace]]"
+        echo "index = $i"
+        echo "output = \"$name\""
+        echo "layout.struts = { left = 16, right = 16, top = 16, bottom = 16 }"
+      done
+      x=$((x + height))   # turned on its side, so it's as wide as it was tall
+    fi
+  done
+}
+
+# React each time the monitors change (the first event is the current setup)
+last=""
+umbriel subscribe outputs | while read -r event; do
+  monitors=$(echo "$event" | jq -c '.data')
+
+  # Only redo things when a monitor is plugged in or removed,
+  # not for the mode/position changes this script causes itself
+  plugged=$(echo "$monitors" | jq -c '[.[] | [.name, .config_name]] | sort')
+  [ "$plugged" = "$last" ] && continue
+  last="$plugged"
+
+  echo "$monitors" | list_monitors | make_config > "$FILE.new"
+  if cmp -s "$FILE.new" "$FILE"; then
+    rm -f "$FILE.new"            # nothing changed
+  else
+    mv "$FILE.new" "$FILE"
+    umbriel msg config-reload || true
+  fi
+done

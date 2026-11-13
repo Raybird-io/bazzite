@@ -1,0 +1,33 @@
+#!/bin/bash
+# ── Resize windows moved between monitors (Umbriel) ──
+# Started by umbriel-resize-on-move.service, only in Umbriel sessions.
+# Umbriel keeps a window's size when it moves to another monitor.
+# This resizes it for the new one: 45% tall on a portrait monitor,
+# a third wide on a landscape one.
+set -e
+
+# Window size for a monitor, based on whether it's turned to portrait
+size_for_monitor() {
+  umbriel outputs --json 2>/dev/null | jq -r --arg name "$1" '
+    (if type == "object" then .ok else . end)[] | select(.name == $name)
+    | if (.transform | test("90|270")) then "0.45" else "0.33" end'
+}
+
+declare -A last_monitor   # remembers which monitor each window was on
+
+umbriel subscribe windows | while read -r event; do
+  focused=$(umbriel focused-window --json 2>/dev/null | jq -r '(if has("ok") then .ok else . end).id // empty' || true)
+
+  while IFS=$'\t' read -r id monitor floating; do
+    previous="${last_monitor[$id]:-}"
+    last_monitor[$id]="$monitor"
+
+    [ -z "$previous" ] && continue              # new window: Umbriel's own per-monitor size handles it
+    [ "$previous" = "$monitor" ] && continue    # didn't change monitor
+    [ "$floating" = "true" ] && continue        # leave floating windows alone
+    [ "$id" = "$focused" ] || continue          # the size action works on the focused window
+
+    size=$(size_for_monitor "$monitor")
+    [ -n "$size" ] && umbriel msg window-set-primary-extent "$size" || true
+  done < <(echo "$event" | jq -r '(.data // .)[] | [.id, .output, (.floating | tostring)] | @tsv' 2>/dev/null || true)
+done

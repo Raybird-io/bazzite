@@ -1,0 +1,110 @@
+# /etc/xdg/umbriel/config.toml  (shipped by my Bazzite image: system_files/etc/xdg/umbriel/)
+# Umbriel with Dux Shell. Mirrors my Niri setup.
+# Docs: https://docs.noctalia.dev/umbriel/
+# Check after editing:  umbriel config validate
+#
+# Umbriel only reads this file when ~/.config/umbriel/config.toml doesn't exist.
+# To try changes without rebuilding the image, create ~/.config/umbriel/config.toml with:
+#   [include]
+#   files = ["/etc/xdg/umbriel/config.toml"]
+# and put the changes below it. Copy them in here once you're happy.
+
+[include]
+files = [
+  #"outputs.toml",
+  "rules.toml",
+  "keybinds.toml",
+]
+
+# Written by the umbriel-monitors helper (/usr/libexec/umbriel-monitors)
+[include.optional]
+files = [
+     "~/.local/state/umbriel/monitors.toml",
+     ]
+
+# ─── General ───────────────────────────────────────────────
+# Dux Shell starts itself through systemd, so nothing to autostart here.
+[general]
+mod_key = "Super"
+show_cheatsheet = false          # like Niri's skip-at-startup
+honor_restored_maximize = false  # like Niri's open-maximized-to-edges false
+
+# ─── Input ─────────────────────────────────────────────────
+[input.keyboard]
+layout = ""             # empty = use the system keyboard layout
+numlock_toggle = true
+
+[input.focus]
+follows_mouse = true
+follows_mouse_max_scroll = 0.0   # focus follows the mouse, but never scrolls the view
+
+[input.cursor]
+theme = "Adwaita"
+size = 24
+
+# ─── Layout ────────────────────────────────────────────────
+# Edge gaps for the ultrawide; side monitors get their own from the monitors helper
+[layout]
+mode = "scrolling"
+gap = 16
+
+[layout.struts]
+left = 64
+right = 64
+top = 64
+bottom = 64
+
+[layout.scrolling]
+default_extent_fraction = 0.34
+center_underfull_strip = true    # like always-center-single-column
+
+# ─── Look ──────────────────────────────────────────────────
+# Dux can't theme Umbriel, so borders use neutral greys that
+# suit any wallpaper or Dux colour scheme.
+[appearance]
+prefer_no_csd = true
+border_width = 1
+corner_radius = 12
+
+[colors.border]
+focused = "#D0D0D080"     # soft light grey, half see-through
+unfocused = "#8080804D"   # same grey as Niri's inactive border
+
+[appearance.shadow]
+enabled = true
+softness = 30
+offset_x = 0
+offset_y = 6
+
+[appearance.blur]
+optimized = false   # blur what's actually behind, not just the wallpaper
+
+
+# ─── Animations: fast, smooth, almost no bounce ────────────
+# "spring:<damping>,<stiffness>": damping 1 = no bounce, higher stiffness = quicker
+[animation.windows_in]
+style = "popin"
+scale = 0.94                 # grows slightly from 94% while fading in
+curve = "spring:1.0,1100"
+
+[animation.windows_out]
+style = "popin"
+scale = 0.96                 # shrinks a touch while fading out
+curve = "spring:1.0,1600"    # closing should feel quicker than opening
+
+[animation.windows_move]
+curve = "spring:0.92,1000"   # a hint of life when windows slide
+
+[animation.windows_resize]
+curve = "spring:1.0,1100"
+
+[animation.workspaces]
+style = "slide"
+curve = "spring:1.0,1000"
+
+[animation.overview]
+curve = "spring:1.0,1000"
+workspace_curve = "spring:1.0,1100"
+
+[animation.border]
+curve = "spring:1.0,1200"

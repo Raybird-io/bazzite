@@ -1,0 +1,11 @@
+[Unit]
+Description=Set up monitors automatically (Umbriel)
+PartOf=umbriel-session.target
+After=umbriel-session.target
+
+[Service]
+ExecStart=/bin/bash /usr/libexec/umbriel-monitors
+Restart=on-failure
+
+[Install]
+WantedBy=umbriel-session.target
