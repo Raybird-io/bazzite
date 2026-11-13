@@ -32,10 +32,17 @@ dnf5 -y install \
 dnf5 -y copr disable duxlabs/dms
 dnf5 -y copr disable duxlabs/dux-repo
 
-### Umbriel compositor, from Terra (already configured in Bazzite)
-# Only nightly builds exist. This package also pulls in its screen-sharing
-# portal (xdg-desktop-portal-umbriel-nightly) and xwayland-satellite.
-dnf5 -y --enablerepo=terra install umbriel-nightly
+### Visual Studio Code, from Microsoft
+dnf5 -y --enablerepo=vscode install code
+
+### From Terra (already configured in Bazzite)
+# umbriel-nightly: the compositor. Only nightly builds exist. Also pulls in its
+#   screen-sharing portal (xdg-desktop-portal-umbriel-nightly) and xwayland-satellite.
+# lact: AMD GPU overclocking, undervolting and fan curves.
+dnf5 -y --enablerepo=terra install \
+umbriel-nightly \
+lact
+
 
 ### Start DMS and my two helper scripts with every Umbriel session (not in GNOME)
 systemctl --global enable umbriel-monitors.service umbriel-resize-on-move.service
@@ -43,3 +50,5 @@ systemctl --global add-wants umbriel-session.target dms.service
 
 #### Example for enabling a System Unit File
 systemctl enable podman.socket
+# LACT's background service, which applies my GPU settings at boot
+systemctl enable lactd.service
