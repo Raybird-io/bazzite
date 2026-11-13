@@ -33,7 +33,7 @@ dnf5 -y copr disable duxlabs/dms
 dnf5 -y copr disable duxlabs/dux-repo
 
 ### Visual Studio Code, from Microsoft
-dnf5 -y --enablerepo=vscode install code
+dnf5 -y --enablerepo=vscde install code
 
 ### From Terra (already configured in Bazzite)
 # umbriel-nightly: the compositor. Only nightly builds exist. Also pulls in its
@@ -51,4 +51,4 @@ systemctl --global add-wants umbriel-session.target dms.service
 #### Example for enabling a System Unit File
 systemctl enable podman.socket
 # LACT's background service, which applies my GPU settings at boot
-systemctl enable lactd.service
+systemctl enable lactd.service 
