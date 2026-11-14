@@ -26,7 +26,8 @@ dnf5 -y install \
     dux-gop \
     matugen \
     cliphist \
-    wl-clipboard
+    wl-clipboard \
+    qt6-qtmultimedia
 
 # Disable the COPRs so they don't stay enabled on the final image
 dnf5 -y copr disable duxlabs/dms
